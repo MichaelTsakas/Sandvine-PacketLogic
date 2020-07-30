@@ -1,0 +1,22 @@
+#  Start by updating the yum
+yum update
+
+#  delete any cache packages left in the system
+yum clean all
+
+#  Install the necessary services using the following command
+yum -y install qemu-kvm qemu-img libvirt libvirt-python libguestfs-tools virt-install net-tools bridge-utils wget
+
+#	 Enable and start libvirt and libvirt-guests
+#  Make sure the result is as follows:
+#  libvirtd.service
+#  loaded    active   running   Virtualization daemon
+#  virt-guest-shutdown.target                                                          
+#  loaded    active   active    Libvirt guests shutdown
+sudo systemctl enable libvirtd
+sudo systemctl start libvirtd
+sudo systemctl enable libvirt-guests
+sudo systemctl start libvirt-guests
+sudo systemctl -a | grep -i "libvirt"
+
+#
