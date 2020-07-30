@@ -34,3 +34,9 @@ IPV6_ADDR_GEN_MODE=stable-privacy
 NAME=ens2f0
 UUID=a6c6dcb5-8fa5-4ce1-9a83-3bafc1d8bcc9
 DEVICE=ens2f0
+
+eth0=ifcfg-ens2f3
+eth2=ifcfg-enp0s29u1u5u4
+eth1=ifcfg-ens2f0
+eth3=ifcfg-ens2f1
+eth4=ifcfg-ens2f2
