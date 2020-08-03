@@ -19,4 +19,172 @@ sudo systemctl enable libvirt-guests
 sudo systemctl start libvirt-guests
 sudo systemctl -a | grep -i "libvirt"
 
-#
+#Create the Linux Bridge that act as a control switch.
+vi /etc/sysconfig/network-scripts/ifcfg-admin
+#add the below in the file. NOTE. Choose either the static or the DHCP option
+
+#DHCP
+DEVICE=admin
+BOOTPROTO=dhcp
+ONBOOT=yes
+TYPE=Bridge
+
+#STATIC
+DEVICE=admin
+BOOTPROTO=none
+ONBOOT=yes
+TYPE=Bridge
+IPADDR=172.25.50.125
+NETMASK=255.255.255.0
+GATEWAY=172.25.50.254
+DNS1=8.8.8.8
+DNS2=4.4.4.4
+DNS3=8.8.4.4
+
+#Edit The already existing interface with the config below in order to act as bridge.
+vi /etc/sysconfig/network-scripts/ifcfg-ens2f3
+
+DEVICE=ens2f3
+ONBOOT=yes
+BRIDGE=admin
+BOOTPROTO=none
+
+#Create the aux interface
+vi /etc/sysconfig/network-scripts/ifcfg-aux
+
+DEVICE=aux
+BOOTPROTO=none
+ONBOOT=yes
+TYPE=Bridge
+
+
+#Create 2 more bridges (ch1int to eno1) and (ch1ext to ens2f0) total of 4 files.
+vi /etc/sysconfig/network-scripts/ifcfg-ch1int
+
+DEVICE=ch1int
+ONBOOT=yes
+TYPE=Bridge
+BOOTPROTO=none
+
+vi /etc/sysconfig/network-scripts/ifcfg-eno1
+
+BRIDGE=ch1int
+ONBOOT=yes
+BOOTPROTO=none
+DEVICE=eno1
+
+vi /etc/sysconfig/network-scripts/ifcfg-ch1ext
+
+DEVICE=ch1ext
+ONBOOT=yes
+TYPE=Bridge
+BOOTPROTO=none
+
+vi /etc/sysconfig/network-scripts/ifcfg-ens2f0
+
+BRIDGE=ch1ext
+ONBOOT=yes
+BOOTPROTO=none
+DEVICE=ens2f0
+
+# restart the netowork services
+service network restart
+
+#Find how much memory the system has
+free -h
+
+#Update the boot parameters to support 1GB huge pages, disable transparent 
+#huge pages and to add 19 Huge pages of 1GB. The max-cstates have been configured to 0
+vi /etc/default/grub
+
+# add the bellow betwen the two " inside the GRUB_CMDLINE_LINUX=
+intel_iommu=on transparent_hugepage=never hugepages=19 default_hugepagesz=1GB hugepagesz=1GB intel_idle.max_cstate=0 processor.max_cstate=0
+
+#Make the grub config
+grub2-mkconfig -o /boot/grub2/grub.cfg
+grub2-mkconfig -o /boot/efi/EFI/centos/grub.cfg
+
+#Configure hugepages
+#create the hugepages file
+mkdir /dev/hugepages1G
+
+#add the bellow line in the fstab file
+vi /etc/fstab
+nodev /dev/hugepages1G hugetlbfs pagesize=1G 0 0
+
+#First create the .service file which will run the /usr/lib/systemd/hugetlb-reserve-pages.sh script at start up.
+vi /usr/lib/systemd/system/hugetlb-gigantic-pages.service
+
+[Unit]
+Description=HugeTLB Gigantic Pages Reservation
+DefaultDependencies=no
+Before=dev-hugepages.mount
+ConditionPathExists=/sys/devices/system/node
+ConditionKernelCommandLine=hugepagesz=1GB
+	
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/systemd/hugetlb-reserve-pages.sh
+
+[Install]
+WantedBy=sysinit.target
+
+#Create the script that will configure the 19 Hugepages specifically for node 0.
+#If there were two nodes and huge pages were to be allocated on each node, an additional reserve_pages call would be required for the other node.
+vi /usr/lib/systemd/hugetlb-reserve-pages.sh
+
+#!/bin/sh
+
+nodes_path=/sys/devices/system/node/
+if [ ! -d $nodes_path ]; then
+	echo "ERROR: $nodes_path does not exist"
+	exit 1
+fi
+
+reserve_pages()
+{
+	echo $1 > $nodes_path/$2/hugepages/hugepages-1048576kB/nr_hugepages
+}
+
+reserve_pages 19 node0
+
+  
+#change the mod of the file to executable
+chmod +x /usr/lib/systemd/hugetlb-reserve-pages.sh
+
+#Enable the service so the script runs at reboot.
+systemctl enable hugetlb-gigantic-pages
+
+#Reboot the server to ensure all changes are applied.
+
+#check for the this line in the below command
+#nodev /dev/hugepages1G hugetlbfs rw,seclabel,relatime,pagesize=1G 0 0
+
+cat /proc/mounts
+
+#check the hugepages are presisted 
+#always madvise [never]
+cat /sys/kernel/mm/transparent_hugepage/enabled
+
+#Check the huge page usage. At this point none should be used
+#AnonHugePages:         0 kB
+#HugePages_Total:      19
+#HugePages_Free:       19
+#HugePages_Rsvd:        0
+#HugePages_Surp:        0
+#Hugepagesize:    1048576 kB
+
+grep -i huge /proc/meminfo
+
+#Check maximum c-state is 0
+cat /sys/module/intel_idle/parameters/max_cstate
+
+
+
+
+
+
+
+
+
