@@ -1,0 +1,77 @@
+#Download the .qcow2 file for PRE 20.30 that we will put into libvirt. We will copy the image locally to save bandwidth but was originally obtained from the support website
+cd /opt
+mkdir install
+cd install
+
+#Check that the folder is created
+pwd
+
+#use filezilla and copy the PRE in to the install folder
+
+#Install the PRE software with the virt-install command. We have named the VM “pl-pre”. Notice that the command includes the number of CPUs, RAM and the bridges made available to the VM.
+#NOTE. Adjust what needs to be adjusted in order to fit your cofiguration.
+
+virt-install \
+  --name=pl-pre \
+  --memory=8192 \
+  --vcpus=4 \
+  --cpuset=4,5,6,7 \
+  --numatune=0 \
+  --cpu mode=host-passthrough \
+  --os-type=linux \
+  --os-variant=virtio26 \
+  --disk path=/opt/install/packetlogic2-xeon-plos_64-20.30.0.20-disk1.qcow2,format=qcow2,bus=virtio,cache=none \
+  --network bridge=admin,model=virtio \
+  --network bridge=aux,model=virtio \
+  --memorybacking hugepages=on,nosharepages=on,size=1,unit=G \
+  --network bridge=ch1int,model=virtio \
+  --network bridge=ch1ext,model=virtio \
+  --autostart \
+  --nographics --noautoconsole --import
+
+#Confirm the pl-pre domain is up and running:
+#You will need to give the PRE 10-15 minutes to complete booting up.Once the VM is running, check the huge page usage. At this point 8 pages should be used
+
+virsh list
+
+grep -i huge /proc/meminfo
+
+#You can see the CPU affinity of the process which contains the VM. First find the pid of the QEMU process for the PRE.
+
+ps -aux | grep qemu
+#find the below number and use it acordingly qemu     14145  122  0.1 9154608 25012 ?
+taskset -cp 14145
+
+
+#Connecting to the Virtual PRE through console:
+
+virsh console pl-pre
+#Password pldemo00
+
+#Configure the PRE admin interface:
+cli
+configure
+set system network interface admin ipv4 static address 172.16.1.25 prefix-length 24 router 172.16.1.1
+set system network nameserver 8.8.8.8
+commit
+
+set system ntp server pool.ntp.org
+set system timezone Europe/London
+commit
+yes
+run show system information
+
+#You can SSH to the license server by first connecting the jumpbox element using ssh, then create new ssh connection to the license manager.
+First, ssh to the jumpbox (you may exit from the server which will take you to the jumpbox) element from your workstation, then ssh to the license server using the default port 42002. 
+
+ssh -p 42002 pladmin@172.16.1.15
+pldemo00
+configure
+set system ntp server pool.ntp.org
+set system timezone Europe/London
+commit
+yes
+
+
+
+
