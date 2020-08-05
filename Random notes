@@ -40,3 +40,20 @@ eth2=ifcfg-enp0s29u1u5u4
 eth1=ifcfg-ens2f0
 eth3=ifcfg-ens2f1
 eth4=ifcfg-ens2f2
+
+
+virt-install --name=pl-pic \
+--memory=7168 \
+--vcpus=4 \
+--cpuset=8,9,10,11 \
+--numatune=0 \
+--os-type=linux \
+--os-variant=virtio26 \
+--disk path=/opt/install/picvpl-20.30.0.20.qcow2,format=qcow2,bus=virtio,cache=none \
+--disk path=/opt/install/pic_disk2.qcow2,size=2,format=qcow2,bus=virtio,cache=none \
+--network bridge=admin,model=virtio \
+--network bridge=aux,model=virtio,mac=52:54:00:00:00:11 \
+--memorybacking hugepages=on,nosharepages=on,size=1,unit=G \
+--nographics --noautoconsole --import
+
+set system network interface admin ipv4 static address 172.25.50.128 prefix-length 24 router 172.25.50.254
