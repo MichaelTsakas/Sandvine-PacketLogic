@@ -57,3 +57,5 @@ virt-install --name=pl-pic \
 --nographics --noautoconsole --import
 
 set system network interface admin ipv4 static address 172.25.50.128 prefix-length 24 router 172.25.50.254
+
+
