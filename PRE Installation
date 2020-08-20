@@ -48,7 +48,7 @@ taskset -cp 14145
 virsh console pl-pre
 #Password pldemo00
 
-#Configure the PRE admin interface:
+#Configure the PRE admin interface:(Change the ip address to your preference)
 cli
 configure
 set system network interface admin ipv4 static address 172.16.1.25 prefix-length 24 router 172.16.1.1
