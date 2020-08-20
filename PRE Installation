@@ -72,4 +72,11 @@ set system timezone Europe/London
 commit
 yes
 
+#Configure the PRE aux interface
+#In this section, you will set a static IP address on the aux interface. In the CLI, enter configure mode. The aux interface is in eth1 (the second network provided in the virsh-install command). The aux interface will be configured on the PIC and PSM elements and can be used for communication between these elements within the server only. We will choose the 172.16.10.0/24 network for the service network. The PRE will be set with the IP 172.16.10.1.
 
+configure
+set system network interface aux physical-interfaces eth1
+set system network interface aux ipv4 static address 172.16.10.1 prefix-length 24
+set system network interface aux enabled
+commit
