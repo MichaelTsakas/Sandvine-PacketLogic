@@ -42,6 +42,19 @@ virsh console pl-psm
 
 >cli
 
+configure
+set system network interface admin ipv4 static address 172.25.50.127 prefix-length 24 router 172.25.50.254
+set system network nameserver 8.8.8.8
+commit
+
+
+#Configuring NTP and Time Zone of PSM
+
+set system ntp server pool.ntp.org
+set system timezone Europe/London
+commit
+yes
+run show system information
 
 
 
