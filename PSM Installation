@@ -57,8 +57,22 @@ yes
 run show system information
 
 
+#SSH to port 42002 instead of 22
+
+#Format the PSM second drive:
+#The second disk provided to the PSM Virtual machine needs to be formatted before it can be used by the PSM and before the PSM is enabled.  Exit #configure mode then run the command below from the PSM cli which will return the disks available for the virtual machine for formatting. Format the #vdb1 disk as shown below
 
 
+exit
+
+system storage format-virtual
+
+#format vdb device 
+#1) vdb   (   2 GiB)
+
+#Q) Quit
+
+1
 
 
 
