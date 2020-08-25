@@ -1,0 +1,25 @@
+#Make sure you have the PSM .qcow image in the /opt/install folder
+#Create a secondary disk for the PSM and create the PSM VM:
+The PSM requires a secondary disk for data. We will create a disk using the qemu-img create command.  Note that the disk created can increase in size if the space is needed up to a 2GBytes limit specified in this command. Also note that the size of the disk in a real deployment will need to be determined as part of the dimensioning exercise.
+
+cd /opt/install
+qemu-img create -f qcow2 psm_disk2.qcow2 2G
+
+#check the bellow with ls -ltr
+#-rw-r--r-- 1 root root    197120 Mar 17 15:23 psm_disk2.qcow2
+
+ls -ltr
+
+#Now create the pl-psm virtual machine as below. The memory and CPU parameters in a real deployment should be determined based on a dimensioning exercise.
+
+virt-install --name=pl-psm --memory=4096 --vcpus=4 \
+--cpuset=8,9,10,11 \
+--numatune=0 \
+--os-type=linux \
+--os-variant=virtio26 \
+--disk path=/opt/install/psmvpl-20.30.0.20.qcow2,format=qcow2,bus=virtio,cache=none \
+--disk path=/opt/install/psm_disk2.qcow2,size=2,format=qcow2,bus=virtio,cache=none \
+--network bridge=admin,model=virtio \
+--network bridge=aux,model=virtio,mac=52:54:00:00:00:10 \
+--memorybacking hugepages=on,nosharepages=on,size=1,unit=G \
+--nographics --noautoconsole –import
