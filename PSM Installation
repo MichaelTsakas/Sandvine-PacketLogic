@@ -1,6 +1,6 @@
 #Make sure you have the PSM .qcow image in the /opt/install folder
 #Create a secondary disk for the PSM and create the PSM VM:
-The PSM requires a secondary disk for data. We will create a disk using the qemu-img create command.  Note that the disk created can increase in size if the space is needed up to a 2GBytes limit specified in this command. Also note that the size of the disk in a real deployment will need to be determined as part of the dimensioning exercise.
+#The PSM requires a secondary disk for data. We will create a disk using the qemu-img create command.  Note that the disk created can increase in size if the space is needed up to a 2GBytes limit specified in this command. Also note that the size of the disk in a real deployment will need to be determined as part of the dimensioning exercise.
 
 cd /opt/install
 qemu-img create -f qcow2 psm_disk2.qcow2 2G
@@ -22,4 +22,35 @@ virt-install --name=pl-psm --memory=4096 --vcpus=4 \
 --network bridge=admin,model=virtio \
 --network bridge=aux,model=virtio,mac=52:54:00:00:00:10 \
 --memorybacking hugepages=on,nosharepages=on,size=1,unit=G \
---nographics --noautoconsole –import
+--nographics --noautoconsole --import
+
+#
+#Confirm PSM domain is up and running:
+#[root@pl-server-1 install]# virsh list
+#Id    Name                           State
+#----------------------------------------------------
+# 1     pl-pre                         running
+# 2     pl-psm                         running
+
+virsh list
+
+#To access the PSM, run the virsh console pl-psm command.Password pldemo00
+
+virsh console pl-psm
+
+#Configure the PSM admin interface:
+
+>cli
+
+
+
+
+
+
+
+
+
+
+
+
+
