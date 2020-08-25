@@ -3,7 +3,7 @@
 #The PIC requires a secondary disk for data. We will create a disk using the qemu-img create command.  Note that the disk created can increase in size if the space is needed up to a 2GBytes limit specified in this command. Also note that the size of the disk in a real deployment will need to be determined as part of the dimensioning exercise.
 
 cd /opt/install
-qemu-img create -f qcow2 pic_disk2.qcow2 2G
+qemu-img create -f qcow2 pic_disk2.qcow2 5G
 
 #check the bellow with ls -ltr
 #-rw-r--r-- 1 root root    197120 Mar 17 15:23 pic_disk2.qcow2
