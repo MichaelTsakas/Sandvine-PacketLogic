@@ -27,7 +27,7 @@ virt-install --name=pl-pic \
 --memorybacking hugepages=on,nosharepages=on,size=1,unit=G \
 --nographics --noautoconsole --import
 
-#Confirm PSM domain is up and running:
+#Confirm PIC domain is up and running:
 #[root@pl-server-1 install]# virsh list
 #Id    Name                           State
 #----------------------------------------------------
