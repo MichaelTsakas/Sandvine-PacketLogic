@@ -20,7 +20,7 @@ virt-install \
   --cpu mode=host-passthrough \
   --os-type=linux \
   --os-variant=virtio26 \
-  --disk path=/opt/install/packetlogic2-xeon-plos_64-20.30.0.20-disk1.qcow2,format=qcow2,bus=virtio,cache=none \
+  --disk path=/opt/install/packetlogic2-xeon-plos_64-21.60.08.1-disk1.qcow2,format=qcow2,bus=virtio,cache=none \
   --network bridge=admin,model=virtio \
   --network bridge=aux,model=virtio \
   --memorybacking hugepages=on,nosharepages=on,size=1,unit=G \
