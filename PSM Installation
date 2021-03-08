@@ -17,7 +17,7 @@ virt-install --name=pl-psm --memory=4096 --vcpus=4 \
 --numatune=0 \
 --os-type=linux \
 --os-variant=virtio26 \
---disk path=/opt/install/packetlogic2-stats_64-21.60.08.1-lm1.0.6.12-disk1.qcow2,format=qcow2,bus=virtio,cache=none \
+--disk path=/opt/install/packetlogic2-stats2_64-21.60.08.1-lm1.0.6.12-disk1.qcow2,format=qcow2,bus=virtio,cache=none \
 --disk path=/opt/install/psm_disk2.qcow2,size=2,format=qcow2,bus=virtio,cache=none \
 --network bridge=admin,model=virtio \
 --network bridge=aux,model=virtio,mac=52:54:00:00:00:10 \
